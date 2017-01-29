@@ -35,8 +35,8 @@ import org.apache.hadoop.hive.serde2.SerDeException;
 import org.apache.hadoop.hive.serde2.SerDeUtils;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.StructField;
+import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
 import org.apache.hadoop.io.Text;
-import org.apache.hive.hcatalog.data.HCatRecordObjectInspector;
 
 /**
  * Streaming Writer handles text input data with regex. Uses
@@ -44,7 +44,7 @@ import org.apache.hive.hcatalog.data.HCatRecordObjectInspector;
  */
 public class StrictRegexWriter extends AbstractRecordWriter {
   private RegexSerDe serde;
-  private final HCatRecordObjectInspector recordObjInspector;
+  private final StructObjectInspector recordObjInspector;
   private final ObjectInspector[] bucketObjInspectors;
   private final StructField[] bucketStructFields;
 
@@ -122,7 +122,7 @@ public class StrictRegexWriter extends AbstractRecordWriter {
     this.serde = createSerde(tbl, conf, regex);
     // get ObjInspectors for entire record and bucketed cols
     try {
-      recordObjInspector = ( HCatRecordObjectInspector ) serde.getObjectInspector();
+      recordObjInspector = ( StructObjectInspector ) serde.getObjectInspector();
       this.bucketObjInspectors = getObjectInspectorsForBucketedCols(bucketIds, recordObjInspector);
     } catch (SerDeException e) {
       throw new SerializationError("Unable to get ObjectInspector for bucket columns", e);
@@ -142,7 +142,7 @@ public class StrictRegexWriter extends AbstractRecordWriter {
   }
 
   @Override
-  protected HCatRecordObjectInspector getRecordObjectInspector() {
+  protected StructObjectInspector getRecordObjectInspector() {
     return recordObjInspector;
   }
 
